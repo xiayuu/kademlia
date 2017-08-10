@@ -5,6 +5,7 @@ from rpcudp.rpcserver import RPCServer, rpccall
 
 KBUCKET_SIZE = 20
 TREE_HEIGHT = 160
+ALPHA = 3
 
 """
 implement rpc call in  kademlia
@@ -35,9 +36,9 @@ class KServer(KademliaRpc):
     def initserver(self):
         self.addnode(self.dict())
 
-    def findclosestk(self, node):
+    def findclosestk(self, key):
         """return the index of closest kbucket"""
-        distance = self.id ^ node['id']
+        distance = self.id ^ key
 
         #find the first big i
         for i in range(0, TREE_HEIGHT):
@@ -45,20 +46,35 @@ class KServer(KademliaRpc):
                 return i
 
     def addnode(self, node):
-        k = self.findclosestk(node)
+        k = self.findclosestk(node['id'])
         if len(self.kbucket[k]) < KBUCKET_SIZE:
             #check if already exist the node
             for n in self.kbucket[k]:
-                if n['id'] == node['ide']:
+                if n['id'] == node['id']:
                     return
             self.kbucket[k].append(node)
 
     def rcp_findnode(self, key, node):
         #add node to kbucket
         self.addnode(node)
+        res = []
+        i, j = self.findclosestk(node['id'])
+        res.extend(self.kbucket[i])
+        while len(res) < KBUCKET_SIZE:
+            i = i - 1
+            j = j + 1
+            if i >= 0:
+                res.extend(self.kbucket[i])
+            if j <= TREE_HEIGHT:
+                res.extend(self.kbucket[j])
+            if i < 0 and j > TREE_HEIGHT:
+                break
+        return res[:KBUCKET_SIZE]
 
-        k = self.findclosestk(node)
-        if len(self.kbucket[k])
+    def nodelookup(self, key):
+        k = self.findclosestk(key)
+
+
 
 
 
