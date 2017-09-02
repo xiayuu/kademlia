@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from rpcudp.rpcserver import RPCServer, rpccall, rpccall_n
+from utils import period_task
 import hashlib
 
 KBUCKET_SIZE = 20
@@ -36,9 +37,18 @@ class KServer(KademliaRpc):
         self.id = int(hashlib.sha1(addr[0]).hexdigest(), 16)
         self.kbucket = [[]] * (TREE_HEIGHT + 1)
         self.initserver(peer)
+        self.report_kbucket()
 
     def dict(self):
         return {"id": str(self.id), "address": self.addr}
+
+    @period_task(period=10)
+    def report_kbucket(self):
+        i = 0
+        for k in self.kbucket:
+            for n in k:
+                print("%d--%d--%s--%s" % (self.id, i, n['id'], n['address'][0]))
+            i = i + 1
 
     def serve(self):
         self.run(self.addr)
@@ -47,6 +57,8 @@ class KServer(KademliaRpc):
         self.addnode(self.dict())
         if peer:
             self.nodelookup(self.id, [{"address": peer}])
+            print(self.id)
+            print(self.kbucket)
 
     def findclosestk(self, key):
         """return the index of closest kbucket"""
@@ -64,7 +76,10 @@ class KServer(KademliaRpc):
             for n in self.kbucket[k]:
                 if n['id'] == node['id']:
                     return
-            self.kbucket[k].append(node)
+            if self.kbucket[k] == []:
+                self.kbucket[k] = [node]
+            else:
+                self.kbucket[k].append(node)
 
     def rpc_findnode(self, key, node):
         #add node to kbucket
