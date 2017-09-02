@@ -1,3 +1,3 @@
 #!/bin/bash
-
+cd /app/kademlia/kademlia/
 python client.py -b `ip -4 addr show eth0 | grep /24 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'`:8090
