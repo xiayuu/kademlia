@@ -46,7 +46,7 @@ class KServer(KademliaRpc):
     def initserver(self, peer):
         self.addnode(self.dict())
         if peer:
-            self.nodelookup(self.id, [peer])
+            self.nodelookup(self.id, [{"address": peer}])
 
     def findclosestk(self, key):
         """return the index of closest kbucket"""
@@ -92,7 +92,7 @@ class KServer(KademliaRpc):
     def nodelookup(self, key, nodes, checkednodes=[]):
         newnode = []
         checkednodes.extend(nodes)
-        res = self.findnode([x['address'] for x in nodes], key, self.dict())
+        res = self.findnode([x['address'] for x in nodes], str(key), self.dict())
 
         newnode.extend([n for n in [r[0] for r in res if r[0]] if n not in checkednodes])
         newnode.sort(key=lambda node : int(node['id']) ^ key)
