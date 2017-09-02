@@ -1,3 +1,4 @@
 #!/bin/bash
-cd /app/kademlia/kademlia/
-python client.py -b `ip -4 addr show eth0 | grep /24 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'`:8090 -p bootnode:8090
+GKEY=f442001b2a9837f4a03db456ef5623476df141a7
+NODEKEY=$(hostname | sha1sum | awk '{print $1}')
+python client.py -b ${NODEKEY}:127.0.0.1:8090 -p ${GKEY}:127.0.0.1:8091

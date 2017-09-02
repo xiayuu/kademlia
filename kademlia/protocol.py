@@ -32,9 +32,9 @@ class KademliaRpc(RPCServer):
 
 class KServer(KademliaRpc):
     def __init__(self, addr, peer=None):
-        super(KademliaRpc, self).__init__(DEBUG=False)
-        self.addr = addr
-        self.id = int(hashlib.sha1(addr[0]).hexdigest(), 16)
+        super(KademliaRpc, self).__init__(DEBUG=True)
+        self.addr = addr[1]
+        self.id = int(addr[0], 16)
         self.kbucket = [[]] * (TREE_HEIGHT + 1)
         self.initserver(peer)
         self.report_kbucket()
@@ -56,9 +56,7 @@ class KServer(KademliaRpc):
     def initserver(self, peer):
         self.addnode(self.dict())
         if peer:
-            self.nodelookup(self.id, [{"address": peer}])
-            print(self.id)
-            print(self.kbucket)
+            self.nodelookup(self.id, [{"id": str(int(peer[0],16)), "address": peer[1]}])
 
     def findclosestk(self, key):
         """return the index of closest kbucket"""
@@ -85,7 +83,7 @@ class KServer(KademliaRpc):
         #add node to kbucket
         self.addnode(node)
         res = []
-        i, j = self.findclosestk(int(key))
+        i = j = self.findclosestk(int(key))
         res.extend(self.kbucket[i])
         while len(res) < KBUCKET_SIZE:
             i = i - 1

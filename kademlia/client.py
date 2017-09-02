@@ -5,14 +5,14 @@ from protocol import KServer
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-b', '--bind', help="ipaddr:port this listen to")
-parser.add_argument('-p', '--peer', help="ipaddr:port node to connect")
+parser.add_argument('-b', '--bind', help="id:ipaddr:port this listen to")
+parser.add_argument('-p', '--peer', help="id:ipaddr:port node to connect")
 args = parser.parse_args()
 
-ip, port = args.bind.split(":")
+id, ip, port = args.bind.split(":")
 if args.peer:
-    peerip, peerport = args.peer.split(":")
-    node = KServer((ip, int(port)), peer=(peerip, int(peerport)))
+    peerid, peerip, peerport = args.peer.split(":")
+    node = KServer((id, (ip, int(port))), peer=(peerid, (peerip, int(peerport))))
 else:
-    node = KServer((ip, int(port)))
+    node = KServer((id, (ip, int(port))))
 node.serve()
