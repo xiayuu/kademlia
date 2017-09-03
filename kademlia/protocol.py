@@ -63,9 +63,8 @@ class KServer(KademliaRpc):
     def findclosestk(self, key):
         """return the index of closest kbucket"""
         distance = self.id ^ key
-
         #find the first big i
-        for i in range(0, TREE_HEIGHT):
+        for i in range(0, TREE_HEIGHT+1):
             if distance < pow(2, i):
                 return i
 
