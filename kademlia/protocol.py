@@ -38,6 +38,7 @@ class KServer(KademliaRpc):
         self.kbucket = [[]] * (TREE_HEIGHT + 1)
         self.initserver(peer)
         self.report_kbucket()
+        self.check_tree()
 
     def dict(self):
         return {"id": str(self.id), "address": self.addr}
