@@ -14,7 +14,7 @@ implement rpc call in  kademlia
 """
 class KademliaRpc(RPCServer):
 
-    @rpccall
+    @rpccall_n
     def ping(self, dest):
         pass
 
