@@ -50,6 +50,13 @@ class KServer(KademliaRpc):
                 print("%d--%d--%s--%s" % (self.id, i, n['id'], n['address'][0]))
             i = i + 1
 
+    @period_task(period=100)
+    def check_tree(self):
+        res = self.ping([n['address'] for b in self.kbucket for n in b])
+        for r,d in res:
+            if not r:
+                self.delnode(d)
+
     def serve(self):
         self.run(self.addr)
 
@@ -79,6 +86,16 @@ class KServer(KademliaRpc):
                 self.kbucket[k] = [node]
             else:
                 self.kbucket[k].append(node)
+
+    def delnode(self, addr):
+        for b in self.kbucket:
+            for n in b:
+                if n['address'] == addr:
+                    b.remove(n)
+                    return
+
+    def rpc_ping(self):
+        return "PONG"
 
     def rpc_findnode(self, key, node):
         #add node to kbucket
