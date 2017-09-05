@@ -16,7 +16,7 @@ if args.peer:
     peerid, peerip, peerport = args.peer.split(":")
     node = KServer((id, (ip, int(port))), peer=(peerid, (peerip, int(peerport))))
 elif args.socketserver:
-    node = SocketServer((id, (ip, int(port)), int(args.socketserver)))
+    node = SocketServer((id, (ip, int(port))), port=int(args.socketserver))
 else:
     node = KServer((id, (ip, int(port))))
 node.serve()

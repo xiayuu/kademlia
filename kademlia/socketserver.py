@@ -5,6 +5,7 @@ from rpcudp.rpcserver import RPCServer, rpccall, rpccall_n
 from protocol import KServer
 from utils import delay_run
 from hashlib import sha1
+import eventlet
 
 class SocketServer(KServer):
     def __init__(self, addr, peer=None, port=None):
@@ -12,16 +13,17 @@ class SocketServer(KServer):
         self.port = port
         self.server()
 
-    def getdestnodes(key):
+    def getdestnodes(self, key):
         sha1key = int(sha1(key).hexdigest(), 16)
         nodes = self.rpc_findnode(sha1key, self.dict())
         return self.nodelookup(sha1key, nodes)
 
-    def handle(fd):
+    def handle(self, fd):
         while True:
             x = fd.readline()
             if not x:
                 break
+            x=x.strip('\n')
             args=x.split(':')
             if args[0] == 'get':
                 key = args[1]
@@ -47,8 +49,9 @@ class SocketServer(KServer):
         while True:
             try:
                 new_sock, address = srv.accept()
-                pool.spawn_n(handle, new_sock.makefile('rw'))
-            except Exception:
+                pool.spawn_n(self.handle, new_sock.makefile('rw'))
+            except Exception, e:
+                print(str(e))
                 break
 
 
