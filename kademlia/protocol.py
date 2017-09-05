@@ -3,7 +3,6 @@
 
 from rpcudp.rpcserver import RPCServer, rpccall, rpccall_n
 from utils import period_task
-import hashlib
 
 KBUCKET_SIZE = 20
 TREE_HEIGHT = 160
@@ -36,6 +35,7 @@ class KServer(KademliaRpc):
         self.addr = addr[1]
         self.id = int(addr[0], 16)
         self.kbucket = [[]] * (TREE_HEIGHT + 1)
+        self.stores = {}
         self.initserver(peer)
         self.report_kbucket()
         self.check_tree()
@@ -50,6 +50,7 @@ class KServer(KademliaRpc):
             for n in k:
                 print("%d--%d--%s--%s" % (self.id, i, n['id'], n['address'][0]))
             i = i + 1
+        print(self.stores)
 
     @period_task(period=100)
     def check_tree(self):
@@ -116,10 +117,11 @@ class KServer(KademliaRpc):
         return res[:KBUCKET_SIZE]
 
     def rpc_findvalue(self, key):
-        pass
+        if key in self.stores:
+            return self.stores[key]
 
     def rpc_store(self, key, value):
-        pass
+        self.stores[key] = value
 
     def nodelookup(self, key, nodes, checkednodes=[]):
         newnode = []
