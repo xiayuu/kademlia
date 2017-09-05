@@ -28,6 +28,8 @@ class SocketServer(KServer):
             if args[0] == 'get':
                 key = args[1]
                 nodes = self.getdestnodes(key)
+                if not nodes:
+                    break
                 values = self.findvalue([n['address'] for n in nodes], key)
                 for v,_ in values:
                     if v:
@@ -38,6 +40,8 @@ class SocketServer(KServer):
                 key = args[1]
                 value = args[2]
                 nodes = self.getdestnodes(key)
+                if not nodes:
+                    break
                 self.store([n['address'] for n in nodes], key, value)
                 fd.write('ok')
                 fd.flush()

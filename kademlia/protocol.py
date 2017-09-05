@@ -133,7 +133,8 @@ class KServer(KademliaRpc):
             self.addnode(node)
 
         if len(newnode) == 0:
-            return nodes
+            checkednodes.sort(key=lambda node : int(node['id']) ^ key)
+            return checkednodes[:KBUCKET_SIZE]
         else:
             self.nodelookup(key, newnode[:KBUCKET_SIZE], checkednodes)
 
