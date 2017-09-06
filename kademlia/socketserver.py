@@ -49,7 +49,7 @@ class SocketServer(KServer):
 
     @delay_run(delay=5)
     def server(self):
-        eventlet.serve(('0.0.0.0', self.port), self.handle)
+        eventlet.serve(eventlet.listen(('0.0.0.0', self.port)), self.handle)
 
 
 
