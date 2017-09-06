@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from protocol import KServer
 from socketserver import SocketServer
 import argparse
 
@@ -14,9 +13,8 @@ args = parser.parse_args()
 id, ip, port = args.bind.split(":")
 if args.peer:
     peerid, peerip, peerport = args.peer.split(":")
-    node = KServer((id, (ip, int(port))), peer=(peerid, (peerip, int(peerport))))
-elif args.socketserver:
-    node = SocketServer((id, (ip, int(port))), port=int(args.socketserver))
+    node = SocketServer((id, (ip, int(port))), peer=(peerid, (peerip, int(peerport))), port=int(args.socketserver))
 else:
-    node = KServer((id, (ip, int(port))))
+    node = SocketServer((id, (ip, int(port))), port=int(args.socketserver))
+
 node.serve()
