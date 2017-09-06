@@ -18,7 +18,8 @@ class SocketServer(KServer):
         nodes = self.rpc_findnode(sha1key, self.dict())
         return self.nodelookup(sha1key, nodes)
 
-    def handle(self, fd):
+    def handle(self, socket, addr):
+        fd = socket.makefile('rw')
         while True:
             x = fd.readline()
             if not x:
@@ -48,15 +49,7 @@ class SocketServer(KServer):
 
     @delay_run(delay=5)
     def server(self):
-        srv = eventlet.listen(('0.0.0.0', self.port))
-        pool = eventlet.GreenPool()
-        while True:
-            try:
-                new_sock, address = srv.accept()
-                pool.spawn_n(self.handle, new_sock.makefile('rw'))
-            except Exception, e:
-                print(str(e))
-                break
+        eventlet.serve(('0.0.0.0', self.port), self.handle)
 
 
 
