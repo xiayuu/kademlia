@@ -3,6 +3,7 @@
 
 from rpcudp.rpcserver import RPCServer, rpccall, rpccall_n
 from utils import period_task
+from hashlib import sha1
 
 KBUCKET_SIZE = 20
 TREE_HEIGHT = 160
@@ -59,6 +60,12 @@ class KServer(KademliaRpc):
             if not r:
                 self.delnode(d)
 
+    @period_task(period=150)
+    def republish(self):
+        for key in self.stores():
+            nodes = self.getdestnodes(key)
+            self.store([n['address'] for n in nodes], key, self.stores[key])
+
     def serve(self):
         self.run(self.addr)
 
@@ -68,6 +75,11 @@ class KServer(KademliaRpc):
             nodes = self.rpc_findnode(self.id,
                                       {"id": str(int(peer[0],16)), "address": peer[1]})
             self.nodelookup(self.id, nodes, [])
+
+    def getdestnodes(self, key):
+        sha1key = int(sha1(key).hexdigest(), 16)
+        nodes = self.rpc_findnode(sha1key, self.dict())
+        return self.nodelookup(sha1key, nodes, [])
 
     def findclosestk(self, key):
         """return the index of closest kbucket"""
@@ -137,9 +149,9 @@ class KServer(KademliaRpc):
 
         if len(newnode) == 0:
             checkednodes.sort(key=lambda node : int(node['id']) ^ key)
-            return checkednodes[:KBUCKET_SIZE]
+            return checkednodes[:ALPHA]
         else:
-            return self.nodelookup(key, newnode[:KBUCKET_SIZE], checkednodes)
+            return self.nodelookup(key, newnode[:ALPHA], checkednodes)
 
 
 

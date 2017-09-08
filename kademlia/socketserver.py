@@ -13,11 +13,6 @@ class SocketServer(KServer):
         self.port = port
         self.server()
 
-    def getdestnodes(self, key):
-        sha1key = int(sha1(key).hexdigest(), 16)
-        nodes = self.rpc_findnode(sha1key, self.dict())
-        return self.nodelookup(sha1key, nodes, [])
-
     def handle(self, socket, addr):
         fd = socket.makefile('rw')
         while True:
